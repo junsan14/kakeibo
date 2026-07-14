@@ -344,7 +344,6 @@ function TransactionEditor({
                   : "例：給与"
               }
               maxLength={100}
-              autoFocus
               required
             />
           </label>

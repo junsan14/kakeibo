@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
+import {
+  useRouter,
+} from "next/navigation";
 import DashboardOverview from "./components/DashboardOverview";
 import TransactionSection from "./components/TransactionSection";
 import MonthlyComparison from "./components/MonthlyComparison";
@@ -43,62 +50,95 @@ export default function FinanceDashboard({
   categoryChartDataByScope,
   monthlyBreakdownByScope,
 }) {
-  const router = useRouter();
+  const router =
+    useRouter();
 
-  const ensuredPeriodRef = useRef("");
+  const ensuredPeriodRef =
+    useRef("");
 
-  const [editingTransaction, setEditingTransaction] = useState(null);
+  const [
+    editingTransaction,
+    setEditingTransaction,
+  ] = useState(null);
 
-  const [isTransactionModalOpen, setIsTransactionModalOpen] =
-    useState(false);
+  const [
+    isTransactionModalOpen,
+    setIsTransactionModalOpen,
+  ] = useState(false);
+
+  const [
+    isNavigating,
+    startNavigation,
+  ] = useTransition();
 
   useEffect(() => {
-    if (ensuredPeriodRef.current === selectedMonth) {
+    if (
+      ensuredPeriodRef.current ===
+      selectedMonth
+    ) {
       return;
     }
 
-    ensuredPeriodRef.current = selectedMonth;
+    ensuredPeriodRef.current =
+      selectedMonth;
 
-    const controller = new AbortController();
+    const controller =
+      new AbortController();
 
     async function ensureRecurring() {
       try {
-        const response = await fetch("/api/recurring/ensure", {
-          method: "POST",
+        const response =
+          await fetch(
+            "/api/recurring/ensure",
+            {
+              method: "POST",
 
-          headers: {
-            "Content-Type": "application/json",
-          },
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
 
-          body: JSON.stringify({
-            monthKey: selectedMonth,
-          }),
+              body:
+                JSON.stringify({
+                  monthKey:
+                    selectedMonth,
+                }),
 
-          signal: controller.signal,
-        });
+              signal:
+                controller.signal,
+            }
+          );
 
-        const result = await response.json();
+        const result =
+          await response.json();
 
         if (!response.ok) {
           console.error(
             "固定収支の反映エラー:",
-            result?.error,
+            result?.error
           );
 
           return;
         }
 
-        if (Number(result?.inserted) > 0) {
+        if (
+          Number(
+            result?.inserted
+          ) > 0
+        ) {
           router.refresh();
         }
       } catch (error) {
-        if (error?.name === "AbortError") {
+        if (
+          error?.name ===
+          "AbortError"
+        ) {
           return;
         }
 
         console.error(
           "固定収支の通信エラー:",
-          error,
+          error
         );
       }
     }
@@ -108,66 +148,141 @@ export default function FinanceDashboard({
     return () => {
       controller.abort();
     };
-  }, [selectedMonth, router]);
+  }, [
+    selectedMonth,
+    router,
+  ]);
 
   function createUrl({
-    month = selectedMonth,
-    tab = activeTab,
+    month =
+      selectedMonth,
+    tab =
+      activeTab,
   }) {
-    const params = new URLSearchParams({
-      month,
-      tab,
-    });
+    const params =
+      new URLSearchParams({
+        month,
+        tab,
+      });
 
     return `/dashboard?${params.toString()}`;
   }
 
-  function changeMonth(month) {
-    setEditingTransaction(null);
-    setIsTransactionModalOpen(false);
+  function navigateTo(url) {
+    startNavigation(() => {
+      router.push(
+        url,
+        {
+          scroll: false,
+        }
+      );
+    });
+  }
 
-    router.push(
+  function changeMonth(
+    month
+  ) {
+    if (
+      !month ||
+      isNavigating
+    ) {
+      return;
+    }
+
+    setEditingTransaction(
+      null
+    );
+
+    setIsTransactionModalOpen(
+      false
+    );
+
+    navigateTo(
       createUrl({
         month,
-      }),
-      {
-        scroll: false,
-      },
+      })
     );
   }
 
   function changeTab(tab) {
-    setEditingTransaction(null);
-    setIsTransactionModalOpen(false);
+    if (
+      !tab ||
+      tab === activeTab ||
+      isNavigating
+    ) {
+      return;
+    }
 
-    router.push(
+    setEditingTransaction(
+      null
+    );
+
+    setIsTransactionModalOpen(
+      false
+    );
+
+    navigateTo(
       createUrl({
         tab,
-      }),
-      {
-        scroll: false,
-      },
+      })
     );
   }
 
   function openNewTransaction() {
-    setEditingTransaction(null);
-    setIsTransactionModalOpen(true);
+    setEditingTransaction(
+      null
+    );
+
+    setIsTransactionModalOpen(
+      true
+    );
   }
 
-  function startTransactionEdit(transaction) {
-    setEditingTransaction(transaction);
-    setIsTransactionModalOpen(true);
+  function startTransactionEdit(
+    transaction
+  ) {
+    setEditingTransaction(
+      transaction
+    );
+
+    setIsTransactionModalOpen(
+      true
+    );
   }
 
   function closeTransactionModal() {
-    setIsTransactionModalOpen(false);
-    setEditingTransaction(null);
+    setIsTransactionModalOpen(
+      false
+    );
+
+    setEditingTransaction(
+      null
+    );
   }
 
   return (
     <>
-      <nav className={styles.tabBar}>
+      {isNavigating && (
+        <div
+          className={
+            styles.navigationProgress
+          }
+          role="progressbar"
+          aria-label="ページを読み込み中"
+          aria-valuetext="読み込み中"
+        >
+          <span />
+        </div>
+      )}
+
+      <nav
+        className={
+          styles.tabBar
+        }
+        aria-busy={
+          isNavigating
+        }
+      >
         {TABS.map((tab) => (
           <button
             key={tab.key}
@@ -180,55 +295,103 @@ export default function FinanceDashboard({
             ]
               .filter(Boolean)
               .join(" ")}
-            onClick={() => changeTab(tab.key)}
+            disabled={
+              isNavigating
+            }
+            onClick={() =>
+              changeTab(
+                tab.key
+              )
+            }
           >
             {tab.label}
           </button>
         ))}
       </nav>
 
-      <section className={styles.monthToolbar}>
+      <section
+        className={
+          styles.monthToolbar
+        }
+        aria-busy={
+          isNavigating
+        }
+      >
         <button
           type="button"
-          className={styles.monthArrow}
-          onClick={() => changeMonth(previousMonth)}
+          className={
+            styles.monthArrow
+          }
+          disabled={
+            isNavigating
+          }
+          onClick={() =>
+            changeMonth(
+              previousMonth
+            )
+          }
           aria-label="前の期間"
         >
           ‹
         </button>
 
-        <label className={styles.monthPicker}>
-          <span>表示する家計期間</span>
+        <label
+          className={
+            styles.monthPicker
+          }
+        >
 
           <input
             type="month"
-            value={selectedMonth}
+            value={
+              selectedMonth
+            }
             min="2000-01"
             max="2100-12"
-            onChange={(event) => {
-              if (event.target.value) {
-                changeMonth(event.target.value);
+            disabled={
+              isNavigating
+            }
+            onChange={(
+              event
+            ) => {
+              if (
+                event.target.value
+              ) {
+                changeMonth(
+                  event.target.value
+                );
               }
             }}
           />
         </label>
 
-        <div className={styles.monthTitle}>
-          <span>{selectedPeriod.label}</span>
-
-          <strong>
-            {selectedPeriod.rangeLabel}
-          </strong>
+        <div
+          className={
+            styles.monthTitle
+          }
+        >
+          <span>
+            {
+              selectedPeriod
+                .rangeLabel
+            }
+          </span>
         </div>
 
         <button
           type="button"
-          className={styles.currentButton}
+          className={
+            styles.currentButton
+          }
           disabled={
-            selectedMonth === currentPeriodKey
+            isNavigating ||
+            selectedMonth ===
+              currentPeriodKey
           }
           onClick={() =>
-            changeMonth(currentPeriodKey)
+            changeMonth(
+              currentPeriodKey
+            )
           }
         >
           今月
@@ -236,21 +399,35 @@ export default function FinanceDashboard({
 
         <button
           type="button"
-          className={styles.monthArrow}
-          onClick={() => changeMonth(nextMonth)}
+          className={
+            styles.monthArrow
+          }
+          disabled={
+            isNavigating
+          }
+          onClick={() =>
+            changeMonth(
+              nextMonth
+            )
+          }
           aria-label="次の期間"
         >
           ›
         </button>
       </section>
 
-      {activeTab === "dashboard" && (
+      {activeTab ===
+        "dashboard" && (
         <>
           <DashboardOverview
             members={members}
-            transactions={transactions}
+            transactions={
+              transactions
+            }
             summary={summary}
-            selectedPeriod={selectedPeriod}
+            selectedPeriod={
+              selectedPeriod
+            }
             categoryChartDataByScope={
               categoryChartDataByScope
             }
@@ -260,19 +437,31 @@ export default function FinanceDashboard({
             editingTransaction={
               editingTransaction
             }
-            categories={categories}
+            categories={
+              categories
+            }
             members={members}
-            currentUserId={profile.id}
-            transactions={transactions}
-            selectedMonth={selectedMonth}
-            selectedPeriod={selectedPeriod}
+            currentUserId={
+              profile.id
+            }
+            transactions={
+              transactions
+            }
+            selectedMonth={
+              selectedMonth
+            }
+            selectedPeriod={
+              selectedPeriod
+            }
             defaultTransactionDate={
               defaultTransactionDate
             }
             isEditorOpen={
               isTransactionModalOpen
             }
-            onEdit={startTransactionEdit}
+            onEdit={
+              startTransactionEdit
+            }
             onCloseEditor={
               closeTransactionModal
             }
@@ -283,41 +472,61 @@ export default function FinanceDashboard({
             className={
               styles.addTransactionButton
             }
-            onClick={openNewTransaction}
+            onClick={
+              openNewTransaction
+            }
             aria-label="家計簿を追加"
             title="家計簿を追加"
           >
-            <span aria-hidden="true">
+            <span
+              aria-hidden="true"
+            >
               ＋
             </span>
           </button>
         </>
       )}
 
-      {activeTab === "comparison" && (
+      {activeTab ===
+        "comparison" && (
         <MonthlyComparison
           members={members}
-          selectedMonth={selectedMonth}
+          selectedMonth={
+            selectedMonth
+          }
           monthlyBreakdownByScope={
             monthlyBreakdownByScope
           }
-          onMonthChange={changeMonth}
+          onMonthChange={
+            changeMonth
+          }
         />
       )}
 
-      {activeTab === "management" && (
+      {activeTab ===
+        "management" && (
         <ManagementSection
-          household={household}
+          household={
+            household
+          }
           profile={profile}
           members={members}
-          categories={categories}
+          categories={
+            categories
+          }
           recurringTransactions={
             recurringTransactions
           }
           settings={settings}
-          selectedMonth={selectedMonth}
-          selectedPeriod={selectedPeriod}
-          monthlyGoal={monthlyGoal}
+          selectedMonth={
+            selectedMonth
+          }
+          selectedPeriod={
+            selectedPeriod
+          }
+          monthlyGoal={
+            monthlyGoal
+          }
         />
       )}
     </>

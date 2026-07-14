@@ -1,8 +1,6 @@
 "use client";
 
-import {
-  useState,
-} from "react";
+import { useState } from "react";
 import {
   Cell,
   Pie,
@@ -11,10 +9,53 @@ import {
   Tooltip,
 } from "recharts";
 import {
+  formatDate,
   formatMoney,
   getScopeOptions,
+  getTransactionScopeKey,
 } from "../lib/dashboardHelpers";
 import styles from "./DashboardOverview.module.css";
+
+
+function getTransactionDateParts(
+  dateValue
+) {
+  const date = new Date(
+    `${dateValue}T00:00:00.000Z`
+  );
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return {
+      monthDay: dateValue,
+      weekday: "",
+    };
+  }
+
+  return {
+    monthDay:
+      new Intl.DateTimeFormat(
+        "ja-JP",
+        {
+          month: "numeric",
+          day: "numeric",
+          timeZone: "UTC",
+        }
+      ).format(date),
+
+    weekday:
+      new Intl.DateTimeFormat(
+        "ja-JP",
+        {
+          weekday: "short",
+          timeZone: "UTC",
+        }
+      ).format(date),
+  };
+}
 
 function CategoryTooltip({
   active,
@@ -39,7 +80,7 @@ function CategoryTooltip({
     total > 0
       ? (
           (
-            item.amount /
+            Number(item.amount) /
             total
           ) *
           100
@@ -64,8 +105,7 @@ function CategoryTooltip({
       </p>
 
       <small>
-        全体の
-        {percentage}%
+        全体の{percentage}%
       </small>
     </div>
   );
@@ -75,56 +115,78 @@ function BudgetSummary({
   summary,
   selectedPeriod,
 }) {
+  const usedPercentage =
+    Number(
+      summary.usedPercentage
+    ) || 0;
+
   const progressWidth =
     Math.min(
-      summary.usedPercentage,
+      Math.max(
+        usedPercentage,
+        0
+      ),
       100
     );
 
+  const isOverBudget =
+    summary.available < 0;
+
   return (
-    <>
-      <section
+    <section
+      className={
+        styles.budgetStatus
+      }
+    >
+      <div
         className={
-          styles.summaryGrid
+          styles.budgetHeader
         }
       >
-        <article
-          className={
-            styles.summaryCard
-          }
-        >
-          <span>
-            {selectedPeriod.label}
-            の収入
-          </span>
-
-          <strong
+        <div>
+          <p
             className={
-              styles.incomeAmount
+              styles.eyebrow
             }
           >
-            {formatMoney(
-              summary.income
-            )}
-          </strong>
+            BUDGET STATUS
+          </p>
 
-          <small>
-            固定収入
-            {formatMoney(
-              summary.fixedIncome
-            )}
-            を含む
-          </small>
-        </article>
+          <h2>
+            今月の使用状況
+          </h2>
 
-        <article
+          <span>
+            {
+              selectedPeriod
+                .rangeLabel
+            }
+          </span>
+        </div>
+
+        <div
           className={
-            styles.summaryCard
+            styles.budgetPercentage
           }
         >
+          <strong>
+            {usedPercentage}%
+          </strong>
+
           <span>
-            {selectedPeriod.label}
-            の支出
+            使用済み
+          </span>
+        </div>
+      </div>
+
+      <div
+        className={
+          styles.progressValues
+        }
+      >
+        <div>
+          <span>
+            現在の支出
           </span>
 
           <strong
@@ -136,201 +198,199 @@ function BudgetSummary({
               summary.expense
             )}
           </strong>
+        </div>
 
-          <small>
-            共有・個人すべての支出
-          </small>
-        </article>
-
-        <article
-          className={
-            styles.summaryCard
-          }
-        >
+        <div>
           <span>
-            今月の貯金目標
+            使用できる予算
           </span>
 
-          <strong
-            className={
-              styles.goalAmount
-            }
-          >
+          <strong>
             {formatMoney(
-              summary.savingsGoal
+              summary.spendingBudget
             )}
           </strong>
+        </div>
+      </div>
 
-          <small>
-            収入から先に確保する金額
-          </small>
-        </article>
-
-        <article
-          className={[
-            styles.summaryCard,
-            styles.availableCard,
-          ].join(" ")}
-        >
-          <span>
-            あと使える金額
-          </span>
-
-          <strong
-            className={
-              summary.available < 0
-                ? styles.expenseAmount
-                : styles.availableAmount
-            }
-          >
-            {formatMoney(
-              summary.available
-            )}
-          </strong>
-
-          <small>
-            収入 − 全支出 − 貯金目標
-          </small>
-        </article>
-      </section>
-
-      <section
+      <div
         className={
-          styles.budgetStatus
+          styles.progressTrack
+        }
+        aria-label={`予算の${usedPercentage}%を使用`}
+      >
+        <span
+          className={
+            usedPercentage > 100
+              ? styles.progressOver
+              : styles.progressBar
+          }
+          style={{
+            width:
+              `${progressWidth}%`,
+          }}
+        />
+      </div>
+
+      <div
+        className={
+          styles.progressFooter
         }
       >
-        <div
+        <span>
+          {usedPercentage}%
+          使用済み
+        </span>
+
+        <strong
           className={
-            styles.budgetHeader
+            isOverBudget
+              ? styles.remainingAmountOver
+              : styles.remainingAmount
           }
         >
-          <div>
-            <p
-              className={
-                styles.eyebrow
-              }
-            >
-              BUDGET STATUS
+          あと使用できる金額{" "}
+          {formatMoney(
+            summary.available
+          )}
+        </strong>
+      </div>
+
+      <div
+        className={
+          styles.budgetStats
+        }
+      >
+        <details
+          className={
+            styles.budgetAccordion
+          }
+        >
+          <summary>
+            <div>
+              <span>
+                今月使える予算
+              </span>
+
+              <strong>
+                {formatMoney(
+                  summary.spendingBudget
+                )}
+              </strong>
+            </div>
+
+            <small>
+              内訳を見る
+            </small>
+          </summary>
+
+          <div
+            className={
+              styles.budgetAccordionContent
+            }
+          >
+            <div>
+              <span>
+                今月の収入
+              </span>
+
+              <strong
+                className={
+                  styles.incomeAmount
+                }
+              >
+                {formatMoney(
+                  summary.income
+                )}
+              </strong>
+            </div>
+
+            <div>
+              <span>
+                貯金目標
+              </span>
+
+              <strong
+                className={
+                  styles.goalAmount
+                }
+              >
+                -
+                {formatMoney(
+                  summary.savingsGoal
+                )}
+              </strong>
+            </div>
+
+            <p>
+              収入 − 貯金目標 ＝
+              今月使える予算
             </p>
-
-            <h2>
-              今期の使用状況
-            </h2>
-
-            <span>
-              {selectedPeriod.rangeLabel}
-            </span>
           </div>
+        </details>
 
-          <div
-            className={
-              styles.budgetPercentage
-            }
-          >
-            <strong>
-              {summary.usedPercentage}
-              %
-            </strong>
+        <div
+          className={
+            styles.budgetStatCard
+          }
+        >
+          <span>
+            残り日数
+          </span>
 
-            <span>
-              使用済み
-            </span>
-          </div>
+          <strong>
+            {summary.remainingDays}
+            日
+          </strong>
+
+          <small>
+            この家計期間の残り
+          </small>
         </div>
 
         <div
           className={
-            styles.progressTrack
+            styles.budgetStatCard
           }
         >
-          <span
-            className={
-              summary.usedPercentage >
-              100
-                ? styles.progressOver
-                : styles.progressBar
-            }
-            style={{
-              width:
-                `${progressWidth}%`,
-            }}
-          />
-        </div>
+          <span>
+            1日あたりの目安
+          </span>
 
-        <div
-          className={
-            styles.budgetStats
-          }
-        >
-          <div>
-            <span>
-              使える予算
-            </span>
-
-            <strong>
-              {formatMoney(
-                summary.spendingBudget
-              )}
-            </strong>
-          </div>
-
-          <div>
-            <span>
-              残り日数
-            </span>
-
-            <strong>
-              {summary.remainingDays}
-              日
-            </strong>
-          </div>
-
-          <div>
-            <span>
-              1日あたりの目安
-            </span>
-
-            <strong>
-              {formatMoney(
-                summary.dailyAvailable
-              )}
-            </strong>
-          </div>
-
-          <div>
-            <span>
-              登録件数
-            </span>
-
-            <strong>
-              {summary.count}
-              件
-            </strong>
-          </div>
-        </div>
-
-        {summary.available < 0 && (
-          <div
-            className={
-              styles.budgetWarning
-            }
-          >
-            貯金目標を確保すると、
+          <strong>
             {formatMoney(
-              Math.abs(
-                summary.available
-              )
+              summary.dailyAvailable
             )}
-            の予算超過です。
-          </div>
-        )}
-      </section>
-    </>
+          </strong>
+
+          <small>
+            残り予算から算出
+          </small>
+        </div>
+      </div>
+
+      {isOverBudget && (
+        <div
+          className={
+            styles.budgetWarning
+          }
+        >
+          貯金目標を確保すると、
+          {formatMoney(
+            Math.abs(
+              summary.available
+            )
+          )}
+          の予算超過です。
+        </div>
+      )}
+    </section>
   );
 }
 
 function CategoryBreakdown({
   members,
+  transactions,
   selectedPeriod,
   categoryChartDataByScope,
 }) {
@@ -341,6 +401,21 @@ function CategoryBreakdown({
     selectedScope,
     setSelectedScope,
   ] = useState("shared");
+
+  const [
+    hoveredPieIndex,
+    setHoveredPieIndex,
+  ] = useState(null);
+
+  const [
+    selectedCategoryId,
+    setSelectedCategoryId,
+  ] = useState(null);
+
+  const [
+    isCategoryOpen,
+    setIsCategoryOpen,
+  ] = useState(false);
 
   const chartData =
     categoryChartDataByScope[
@@ -361,6 +436,110 @@ function CategoryBreakdown({
         option.key ===
         selectedScope
     );
+
+  const selectedCategory =
+    chartData.find(
+      (item) =>
+        item.id ===
+        selectedCategoryId
+    );
+
+  const categoryTransactions =
+    selectedCategory
+      ? transactions
+          .filter(
+            (transaction) => {
+              return (
+                transaction
+                  .transaction_type ===
+                  "expense" &&
+                transaction
+                  .category_id ===
+                  selectedCategory.id &&
+                getTransactionScopeKey(
+                  transaction
+                ) === selectedScope
+              );
+            }
+          )
+          .sort(
+            (
+              first,
+              second
+            ) => {
+              const dateComparison =
+                String(
+                  second
+                    .transaction_date
+                ).localeCompare(
+                  String(
+                    first
+                      .transaction_date
+                  )
+                );
+
+              if (
+                dateComparison !== 0
+              ) {
+                return dateComparison;
+              }
+
+              return String(
+                second.created_at ??
+                  ""
+              ).localeCompare(
+                String(
+                  first.created_at ??
+                    ""
+                )
+              );
+            }
+          )
+      : [];
+
+  function changeScope(
+    scopeKey
+  ) {
+    setSelectedScope(
+      scopeKey
+    );
+
+    setHoveredPieIndex(
+      null
+    );
+
+    setSelectedCategoryId(
+      null
+    );
+
+    setIsCategoryOpen(
+      false
+    );
+  }
+
+  function selectCategory(
+    categoryId
+  ) {
+    if (
+      selectedCategoryId ===
+      categoryId
+    ) {
+      setIsCategoryOpen(
+        (current) =>
+          !current
+      );
+
+      return;
+    }
+
+    setSelectedCategoryId(
+      categoryId
+    );
+
+    setIsCategoryOpen(
+      true
+    );
+  }
 
   return (
     <section
@@ -414,7 +593,7 @@ function CategoryBreakdown({
                 .filter(Boolean)
                 .join(" ")}
               onClick={() =>
-                setSelectedScope(
+                changeScope(
                   option.key
                 )
               }
@@ -445,125 +624,426 @@ function CategoryBreakdown({
           </p>
         </div>
       ) : (
-        <div
-          className={
-            styles.pieLayout
-          }
-        >
+        <>
           <div
             className={
-              styles.pieChart
+              styles.pieLayout
             }
           >
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
+            <div
+              className={
+                styles.pieChart
+              }
             >
-              <PieChart>
-                <Pie
-                  data={chartData}
-                  dataKey="amount"
-                  nameKey="name"
-                  innerRadius="56%"
-                  outerRadius="80%"
-                  paddingAngle={3}
-                  cornerRadius={4}
-                  stroke="none"
-                >
-                  {chartData.map(
-                    (item) => (
-                      <Cell
-                        key={item.id}
-                        fill={
-                          item.color
-                        }
-                      />
-                    )
-                  )}
-                </Pie>
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+              >
+                <PieChart>
+                  <Pie
+                    data={
+                      chartData
+                    }
+                    dataKey="amount"
+                    nameKey="name"
+                    innerRadius="56%"
+                    outerRadius="80%"
+                    paddingAngle={3}
+                    cornerRadius={4}
+                    stroke="none"
+                    onMouseEnter={(
+                      _,
+                      index
+                    ) => {
+                      setHoveredPieIndex(
+                        index
+                      );
+                    }}
+                    onMouseLeave={() => {
+                      setHoveredPieIndex(
+                        null
+                      );
+                    }}
+                  >
+                    {chartData.map(
+                      (item) => (
+                        <Cell
+                          key={
+                            item.id
+                          }
+                          fill={
+                            item.color
+                          }
+                          opacity={
+                            selectedCategoryId &&
+                            selectedCategoryId !==
+                              item.id
+                              ? 0.42
+                              : 1
+                          }
+                          className={
+                            styles.pieCell
+                          }
+                          onClick={() =>
+                            selectCategory(
+                              item.id
+                            )
+                          }
+                        />
+                      )
+                    )}
+                  </Pie>
 
-                <Tooltip
-                  content={
-                    <CategoryTooltip
-                      total={total}
-                    />
-                  }
-                />
-              </PieChart>
-            </ResponsiveContainer>
+                  <Tooltip
+                    cursor={false}
+                    offset={18}
+                    wrapperStyle={{
+                      zIndex: 20,
+                      pointerEvents:
+                        "none",
+                    }}
+                    content={
+                      <CategoryTooltip
+                        total={total}
+                      />
+                    }
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+
+              <div
+                className={[
+                  styles.pieCenter,
+                  hoveredPieIndex !==
+                  null
+                    ? styles.pieCenterHidden
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                <span>
+                  支出合計
+                </span>
+
+                <strong>
+                  {formatMoney(
+                    total
+                  )}
+                </strong>
+              </div>
+            </div>
 
             <div
               className={
-                styles.pieCenter
+                styles.pieLegend
               }
             >
-              <span>
-                支出合計
-              </span>
+              {chartData.map(
+                (item) => {
+                  const percentage =
+                    total > 0
+                      ? (
+                          (
+                            Number(
+                              item.amount
+                            ) /
+                            total
+                          ) *
+                          100
+                        ).toFixed(
+                          1
+                        )
+                      : "0.0";
 
-              <strong>
-                {formatMoney(total)}
-              </strong>
+                  const isSelected =
+                    selectedCategoryId ===
+                    item.id;
+
+                  return (
+                    <button
+                      key={
+                        item.id
+                      }
+                      type="button"
+                      className={[
+                        styles.legendItem,
+                        isSelected
+                          ? styles.legendItemSelected
+                          : "",
+                      ]
+                        .filter(
+                          Boolean
+                        )
+                        .join(" ")}
+                      onClick={() =>
+                        selectCategory(
+                          item.id
+                        )
+                      }
+                      aria-expanded={
+                        isSelected &&
+                        isCategoryOpen
+                      }
+                    >
+                      <span
+                        className={
+                          styles.legendColor
+                        }
+                        style={{
+                          backgroundColor:
+                            item.color,
+                        }}
+                      />
+
+                      <div>
+                        <strong>
+                          {item.icon}{" "}
+                          {item.name}
+                        </strong>
+
+                        <small>
+                          {percentage}
+                          %
+                        </small>
+                      </div>
+
+                      <b>
+                        {formatMoney(
+                          item.amount
+                        )}
+                      </b>
+
+                      <i
+                        aria-hidden="true"
+                      >
+                        {isSelected &&
+                        isCategoryOpen
+                          ? "−"
+                          : "＋"}
+                      </i>
+                    </button>
+                  );
+                }
+              )}
             </div>
           </div>
 
-          <div
-            className={
-              styles.pieLegend
-            }
-          >
-            {chartData.map(
-              (item) => {
-                const percentage =
-                  total > 0
-                    ? (
-                        (
-                          item.amount /
-                          total
-                        ) *
-                        100
-                      ).toFixed(1)
-                    : "0.0";
-
-                return (
-                  <div
-                    key={item.id}
-                    className={
-                      styles.legendItem
-                    }
-                  >
-                    <span
-                      className={
-                        styles.legendColor
-                      }
-                      style={{
-                        backgroundColor:
-                          item.color,
-                      }}
-                    />
-
-                    <div>
-                      <strong>
-                        {item.icon}{" "}
-                        {item.name}
-                      </strong>
-
-                      <small>
-                        {percentage}%
-                      </small>
-                    </div>
-
-                    <b>
-                      {formatMoney(
-                        item.amount
-                      )}
-                    </b>
-                  </div>
-                );
+          {selectedCategory && (
+            <div
+              className={
+                styles.categoryAccordion
               }
-            )}
-          </div>
-        </div>
+            >
+              <button
+                type="button"
+                className={
+                  styles.categoryAccordionSummary
+                }
+                onClick={() =>
+                  setIsCategoryOpen(
+                    (current) =>
+                      !current
+                  )
+                }
+                aria-expanded={
+                  isCategoryOpen
+                }
+              >
+                <div>
+                  <span
+                    className={
+                      styles.categoryAccordionIcon
+                    }
+                    style={{
+                      backgroundColor:
+                        `${selectedCategory.color}18`,
+                    }}
+                  >
+                    {
+                      selectedCategory
+                        .icon
+                    }
+                  </span>
+
+                  <div>
+                    <strong>
+                      {
+                        selectedCategory
+                          .name
+                      }
+                      の詳細
+                    </strong>
+
+                    <small>
+                      {
+                        selectedPeriod
+                          .label
+                      }
+                      ・
+                      {
+                        activeScope
+                          ?.label
+                      }
+                      ・
+                      {
+                        categoryTransactions
+                          .length
+                      }
+                      件
+                    </small>
+                  </div>
+                </div>
+
+                <div
+                  className={
+                    styles.categoryAccordionAmount
+                  }
+                >
+                  <strong>
+                    {formatMoney(
+                      selectedCategory
+                        .amount
+                    )}
+                  </strong>
+
+                  <span
+                    aria-hidden="true"
+                  >
+                    {isCategoryOpen
+                      ? "−"
+                      : "＋"}
+                  </span>
+                </div>
+              </button>
+
+              {isCategoryOpen && (
+                <div
+                  className={
+                    styles.categoryAccordionContent
+                  }
+                >
+                  {categoryTransactions
+                    .length ===
+                  0 ? (
+                    <div
+                      className={
+                        styles.categoryEmpty
+                      }
+                    >
+                      詳細データがありません。
+                    </div>
+                  ) : (
+                    <div
+                      className={
+                        styles.categoryTransactionList
+                      }
+                    >
+                      {categoryTransactions.map(
+                        (transaction) => {
+                          const dateParts =
+                            getTransactionDateParts(
+                              transaction
+                                .transaction_date
+                            );
+
+                          return (
+                            <article
+                              key={
+                                transaction.id
+                              }
+                              className={
+                                styles.categoryTransactionItem
+                              }
+                            >
+                              <div
+                                className={
+                                  styles.categoryTransactionDate
+                                }
+                              >
+                                <strong>
+                                  {dateParts.monthDay}
+                                </strong>
+
+                                {dateParts.weekday && (
+                                  <span>
+                                    （
+                                    {dateParts.weekday}
+                                    ）
+                                  </span>
+                                )}
+                              </div>
+
+                              <div
+                                className={
+                                  styles.categoryTransactionBody
+                                }
+                              >
+                                <span
+                                  className={
+                                    styles.categoryTransactionPayerIcon
+                                  }
+                                  title={`支払者：${
+                                    transaction.paid_by
+                                      ?.display_name ??
+                                    "ユーザー"
+                                  }`}
+                                  aria-label={`支払者：${
+                                    transaction.paid_by
+                                      ?.display_name ??
+                                    "ユーザー"
+                                  }`}
+                                >
+                                  {(
+                                    transaction.paid_by
+                                      ?.display_name ??
+                                    "ユ"
+                                  )
+                                    .trim()
+                                    .slice(0, 1)}
+                                </span>
+
+                                <div
+                                  className={
+                                    styles.categoryTransactionTitle
+                                  }
+                                >
+                                  <strong>
+                                    {transaction.title}
+                                  </strong>
+
+                                  {transaction
+                                    .recurring_group_id && (
+                                    <span>
+                                      固定
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              <strong
+                                className={
+                                  styles.categoryTransactionAmount
+                                }
+                              >
+                                -
+                                {formatMoney(
+                                  transaction.amount
+                                )}
+                              </strong>
+                
+                            </article>
+                            
+                          );
+                        }
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
     </section>
   );
@@ -589,7 +1069,10 @@ function SettlementAccordion({
 
   const totalSharedExpense =
     sharedExpenses.reduce(
-      (sum, transaction) =>
+      (
+        sum,
+        transaction
+      ) =>
         sum +
         Number(
           transaction.amount
@@ -598,37 +1081,43 @@ function SettlementAccordion({
     );
 
   const memberPayments =
-    members.map((member) => {
-      const displayName =
-        member.profile
-          ?.display_name ??
-        "ユーザー";
+    members.map(
+      (member) => {
+        const displayName =
+          member.profile
+            ?.display_name ??
+          "ユーザー";
 
-      const paidAmount =
-        sharedExpenses
-          .filter(
-            (transaction) =>
-              transaction
-                .paid_by_user_id ===
-              member.user_id
-          )
-          .reduce(
-            (sum, transaction) =>
-              sum +
-              Number(
-                transaction.amount
-              ),
-            0
-          );
+        const paidAmount =
+          sharedExpenses
+            .filter(
+              (
+                transaction
+              ) =>
+                transaction
+                  .paid_by_user_id ===
+                member.user_id
+            )
+            .reduce(
+              (
+                sum,
+                transaction
+              ) =>
+                sum +
+                Number(
+                  transaction.amount
+                ),
+              0
+            );
 
-      return {
-        userId:
-          member.user_id,
-
-        displayName,
-        paidAmount,
-      };
-    });
+        return {
+          userId:
+            member.user_id,
+          displayName,
+          paidAmount,
+        };
+      }
+    );
 
   const perPerson =
     memberPayments.length > 0
@@ -644,13 +1133,19 @@ function SettlementAccordion({
     const sorted = [
       ...memberPayments,
     ].sort(
-      (first, second) =>
+      (
+        first,
+        second
+      ) =>
         first.paidAmount -
         second.paidAmount
     );
 
-    const from = sorted[0];
-    const to = sorted[1];
+    const from =
+      sorted[0];
+
+    const to =
+      sorted[1];
 
     const difference =
       to.paidAmount -
@@ -811,7 +1306,7 @@ function SettlementAccordion({
           }
         >
           <span>
-            共有支出
+            共有支出{" "}
             {formatMoney(
               totalSharedExpense
             )}
@@ -831,7 +1326,7 @@ function SettlementAccordion({
           </i>
 
           <strong>
-            一人
+            一人{" "}
             {formatMoney(
               perPerson
             )}
@@ -904,6 +1399,9 @@ export default function DashboardOverview({
 
       <CategoryBreakdown
         members={members}
+        transactions={
+          transactions
+        }
         selectedPeriod={
           selectedPeriod
         }

@@ -770,11 +770,15 @@
     flex-direction: column;
   }
 
-  .allocationOptions,
-  .formGrid,
-  .historyScopeTabs {
+  .allocationOptions{
+       grid-template-columns: 33% 33% 33%;
+  }
+  .formGrid{
     grid-template-columns:
       minmax(0, 1fr);
+  }
+  .historyScopeTabs {
+    grid-template-columns:33% 33% 33%;
   }
 
   .fullWidth {

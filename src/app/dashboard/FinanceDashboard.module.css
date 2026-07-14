@@ -1,18 +1,90 @@
+.navigationProgress {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 9999;
+  height: 4px;
+  overflow: hidden;
+  background:
+    rgba(
+      99,
+      102,
+      241,
+      0.13
+    );
+  pointer-events: none;
+}
+
+.navigationProgress span {
+  width: 45%;
+  height: 100%;
+  display: block;
+  background:
+    linear-gradient(
+      90deg,
+      #6366f1,
+      #8b5cf6,
+      #a78bfa
+    );
+  border-radius:
+    0 999px 999px 0;
+  box-shadow:
+    0 0 12px
+    rgba(
+      99,
+      102,
+      241,
+      0.65
+    );
+  animation:
+    navigationProgressMove
+    0.95s ease-in-out
+    infinite;
+  will-change: transform;
+}
+
+@keyframes navigationProgressMove {
+  0% {
+    transform:
+      translateX(-110%)
+      scaleX(0.65);
+  }
+
+  45% {
+    transform:
+      translateX(90%)
+      scaleX(1);
+  }
+
+  100% {
+    transform:
+      translateX(260%)
+      scaleX(0.7);
+  }
+}
+
 .tabBar {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns:
+    repeat(3, 1fr);
   gap: 7px;
   margin-bottom: 15px;
   padding: 6px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background:
+    var(--color-surface);
+  border:
+    1px solid
+    var(--color-border);
   border-radius: 17px;
-  box-shadow: var(--shadow-small);
+  box-shadow:
+    var(--shadow-small);
 }
 
 .tabButton {
   min-height: 47px;
-  color: var(--color-text-muted);
+  color:
+    var(--color-text-muted);
   font: inherit;
   font-size: 13px;
   font-weight: 800;
@@ -22,9 +94,16 @@
   cursor: pointer;
 }
 
-.tabButton:hover {
-  color: var(--color-primary);
-  background: rgba(99, 102, 241, 0.06);
+.tabButton:hover:not(:disabled) {
+  color:
+    var(--color-primary);
+  background:
+    rgba(
+      99,
+      102,
+      241,
+      0.06
+    );
 }
 
 .tabButtonActive {
@@ -37,10 +116,26 @@
     );
   box-shadow:
     0 8px 18px
-    rgba(99, 102, 241, 0.2);
+    rgba(
+      99,
+      102,
+      241,
+      0.2
+    );
+}
+
+.tabButton:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.tabButtonActive:disabled {
+  color: white;
+  opacity: 0.85;
 }
 
 .monthToolbar {
+  position: relative;
   display: grid;
   grid-template-columns:
     44px
@@ -52,12 +147,14 @@
   gap: 12px;
   margin-bottom: 20px;
   padding: 15px;
-  background: var(--color-surface);
+  background:
+    var(--color-surface);
   border:
     1px solid
     var(--color-border);
   border-radius: 18px;
-  box-shadow: var(--shadow-small);
+  box-shadow:
+    var(--shadow-small);
 }
 
 .monthArrow {
@@ -65,7 +162,8 @@
   height: 44px;
   display: grid;
   place-items: center;
-  color: var(--color-text);
+  color:
+    var(--color-text);
   font: inherit;
   font-size: 28px;
   line-height: 1;
@@ -76,51 +174,74 @@
   cursor: pointer;
 }
 
-.monthArrow:hover {
+.monthArrow:hover:not(:disabled) {
   color: white;
-  background: var(--color-primary);
+  background:
+    var(--color-primary);
+}
+
+.monthArrow:disabled {
+  cursor: wait;
+  opacity: 0.55;
 }
 
 .monthPicker {
+  min-width: 0;
   display: grid;
   gap: 5px;
 }
 
-.monthPicker span,
-.monthTitle span {
-  color: var(--color-text-muted);
+.monthPicker span {
+  color:
+    var(--color-text-muted);
   font-size: 9px;
   font-weight: 800;
 }
 
 .monthPicker input {
+
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   height: 40px;
+  display: block;
   padding: 0 11px;
-  color: var(--color-text);
+  color:
+    var(--color-text);
   font: inherit;
   font-size: 12px;
   font-weight: 700;
-  background: var(--color-input);
+  background:
+    var(--color-input);
   border:
     1px solid
     var(--color-border);
   border-radius: 10px;
   outline: none;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.monthPicker input:disabled {
+  cursor: wait;
+  opacity: 0.65;
 }
 
 .monthTitle {
   min-width: 0;
   display: grid;
   justify-items: center;
-  gap: 3px;
   text-align: center;
 }
 
-.monthTitle strong {
+.monthTitle span {
+  max-width: 100%;
   overflow: hidden;
-  font-size: 15px;
-  letter-spacing: -0.03em;
+  color:
+    var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -129,21 +250,33 @@
   min-width: 65px;
   height: 40px;
   padding: 0 14px;
-  color: var(--color-primary);
+  color:
+    var(--color-primary);
   font: inherit;
   font-size: 11px;
   font-weight: 800;
   background:
-    rgba(99, 102, 241, 0.09);
+    rgba(
+      99,
+      102,
+      241,
+      0.09
+    );
   border:
     1px solid
-    rgba(99, 102, 241, 0.18);
+    rgba(
+      99,
+      102,
+      241,
+      0.18
+    );
   border-radius: 10px;
   cursor: pointer;
 }
 
 .currentButton:disabled {
-  color: var(--color-text-muted);
+  color:
+    var(--color-text-muted);
   background:
     var(--color-background-soft);
   border-color:
@@ -152,17 +285,26 @@
   opacity: 0.65;
 }
 
+.monthToolbar[aria-busy="true"]
+  .currentButton:disabled {
+  cursor: wait;
+}
+
 .addTransactionButton {
   position: fixed;
   right:
     max(
       24px,
-      env(safe-area-inset-right)
+      env(
+        safe-area-inset-right
+      )
     );
   bottom:
     max(
       24px,
-      env(safe-area-inset-bottom)
+      env(
+        safe-area-inset-bottom
+      )
     );
   z-index: 900;
   width: 62px;
@@ -179,11 +321,21 @@
     );
   border:
     1px solid
-    rgba(255, 255, 255, 0.28);
+    rgba(
+      255,
+      255,
+      255,
+      0.28
+    );
   border-radius: 50%;
   box-shadow:
     0 16px 35px
-    rgba(79, 70, 229, 0.35);
+    rgba(
+      79,
+      70,
+      229,
+      0.35
+    );
   cursor: pointer;
   transition:
     transform 0.18s ease,
@@ -196,16 +348,25 @@
   font-size: 35px;
   font-weight: 300;
   line-height: 1;
-  transform: translateY(-1px);
-  transition: transform 0.18s ease;
+  transform:
+    translateY(-1px);
+  transition:
+    transform 0.18s ease;
 }
 
 .addTransactionButton:hover {
-  filter: brightness(1.05);
-  transform: translateY(-3px);
+  filter:
+    brightness(1.05);
+  transform:
+    translateY(-3px);
   box-shadow:
     0 20px 42px
-    rgba(79, 70, 229, 0.42);
+    rgba(
+      79,
+      70,
+      229,
+      0.42
+    );
 }
 
 .addTransactionButton:hover span {
@@ -217,7 +378,12 @@
 .addTransactionButton:focus-visible {
   outline:
     3px solid
-    rgba(99, 102, 241, 0.28);
+    rgba(
+      99,
+      102,
+      241,
+      0.28
+    );
   outline-offset: 4px;
 }
 
@@ -227,7 +393,22 @@
     scale(0.96);
 }
 
+@media (
+  prefers-reduced-motion:
+    reduce
+) {
+  .navigationProgress span {
+    width: 100%;
+    animation: none;
+    opacity: 0.8;
+  }
+}
+
 @media (max-width: 760px) {
+  .navigationProgress {
+    height: 3px;
+  }
+
   .tabButton {
     font-size: 11px;
   }
@@ -237,25 +418,56 @@
       42px
       minmax(0, 1fr)
       42px;
+    grid-template-rows:
+      auto auto;
     gap: 8px;
-    padding: 11px;
+    padding:
+      40px 11px 12px;
+    overflow: hidden;
   }
 
   .monthPicker {
     grid-column: 2;
     grid-row: 1;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .monthPicker span {
+    text-align: center;
+  }
+
+  .monthPicker input {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .monthTitle {
-    grid-column: 1 / -1;
+    grid-column:
+      1 / -1;
     grid-row: 2;
-    padding: 5px 0;
+    min-width: 0;
+    padding:
+      4px 4px 0;
+  }
+
+  .monthTitle span {
+    font-size: 9px;
+    font-weight: 500;
   }
 
   .currentButton {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    width: 100%;
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    z-index: 2;
+    min-width: 0;
+    width: auto;
+    height: 25px;
+    padding: 0 9px;
+    font-size: 9px;
+    border-radius: 999px;
   }
 
   .monthArrow:first-child {
@@ -272,12 +484,16 @@
     right:
       max(
         16px,
-        env(safe-area-inset-right)
+        env(
+          safe-area-inset-right
+        )
       );
     bottom:
       max(
         16px,
-        env(safe-area-inset-bottom)
+        env(
+          safe-area-inset-bottom
+        )
       );
     width: 56px;
     height: 56px;
