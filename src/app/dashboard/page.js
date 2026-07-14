@@ -1023,13 +1023,33 @@ export default async function DashboardPage({
           .cycle_start_day
       );
 
-    const [
-      transactionResult,
-      comparisonResult,
-      planResult,
-      recurringResult,
-    ] = await Promise.all([
-      supabase
+    const shouldLoadDashboard =
+  activeTab === "dashboard";
+
+const shouldLoadComparison =
+  activeTab === "comparison";
+
+const shouldLoadManagement =
+  activeTab === "management";
+
+const emptyListResult = {
+  data: [],
+  error: null,
+};
+
+const emptySingleResult = {
+  data: null,
+  error: null,
+};
+
+const [
+  transactionResult,
+  comparisonResult,
+  planResult,
+  recurringResult,
+] = await Promise.all([
+  shouldLoadDashboard
+    ? supabase
         .from("transactions")
         .select(`
           id,
@@ -1075,9 +1095,13 @@ export default async function DashboardPage({
             ascending: false,
           }
         )
-        .limit(500),
+        .limit(500)
+    : Promise.resolve(
+        emptyListResult
+      ),
 
-      supabase
+  shouldLoadComparison
+    ? supabase
         .from("transactions")
         .select(`
           amount,
@@ -1102,12 +1126,17 @@ export default async function DashboardPage({
           "transaction_date",
           lastPeriodRange
             .endExclusive
-        ),
-
-      supabase
-        .from(
-          "monthly_plans"
         )
+    : Promise.resolve(
+        emptyListResult
+      ),
+
+  (
+    shouldLoadDashboard ||
+    shouldLoadManagement
+  )
+    ? supabase
+        .from("monthly_plans")
         .select(
           "savings_goal"
         )
@@ -1119,9 +1148,13 @@ export default async function DashboardPage({
           "period_key",
           `${selectedMonth}-01`
         )
-        .maybeSingle(),
+        .maybeSingle()
+    : Promise.resolve(
+        emptySingleResult
+      ),
 
-      supabase
+  shouldLoadManagement
+    ? supabase
         .from(
           "recurring_transactions"
         )
@@ -1155,8 +1188,11 @@ export default async function DashboardPage({
           {
             ascending: false,
           }
-        ),
-    ]);
+        )
+    : Promise.resolve(
+        emptyListResult
+      ),
+]);
 
     logQueryError(
       "Transactions query error:",

@@ -870,6 +870,121 @@ async function validateTransactionMembers(
     );
   }
 }
+async function validateTransactionRelations({
+  supabase,
+  householdId,
+  values,
+  monthKey = "",
+  tab = "dashboard",
+}) {
+  const requiredMemberIds = Array.from(
+    new Set(
+      [
+        values.paidByUserId,
+
+        values.allocationScope ===
+          "personal"
+          ? values.personalOwnerUserId
+          : null,
+      ].filter(Boolean)
+    )
+  );
+
+  const [
+    categoryResult,
+    membersResult,
+  ] = await Promise.all([
+    supabase
+      .from("categories")
+      .select("id")
+      .eq(
+        "id",
+        values.categoryId
+      )
+      .eq(
+        "household_id",
+        householdId
+      )
+      .eq(
+        "category_type",
+        values.transactionType
+      )
+      .maybeSingle(),
+
+    supabase
+      .from("household_members")
+      .select("user_id")
+      .eq(
+        "household_id",
+        householdId
+      )
+      .in(
+        "user_id",
+        requiredMemberIds
+      ),
+  ]);
+
+  if (
+    categoryResult.error ||
+    !categoryResult.data
+  ) {
+    redirectWithError(
+      "選択したカテゴリが見つからないか、種類が一致していません。",
+      monthKey,
+      tab
+    );
+  }
+
+  if (membersResult.error) {
+    console.error(
+      "Transaction member validation error:",
+      membersResult.error
+    );
+
+    redirectWithError(
+      "家計のメンバー情報を確認できませんでした。",
+      monthKey,
+      tab
+    );
+  }
+
+  const validMemberIds =
+    new Set(
+      (
+        membersResult.data ?? []
+      ).map(
+        (member) =>
+          member.user_id
+      )
+    );
+
+  if (
+    !validMemberIds.has(
+      values.paidByUserId
+    )
+  ) {
+    redirectWithError(
+      "支払った人または受け取った人が家計に参加していません。",
+      monthKey,
+      tab
+    );
+  }
+
+  if (
+    values.allocationScope ===
+      "personal" &&
+    values.personalOwnerUserId &&
+    !validMemberIds.has(
+      values.personalOwnerUserId
+    )
+  ) {
+    redirectWithError(
+      "個人購入の所有者が家計に参加していません。",
+      monthKey,
+      tab
+    );
+  }
+}
 
 function getRecurringDate({
   periodKey,
@@ -1379,10 +1494,9 @@ export async function createTransactionAction(
   const {
     monthKey,
     tab,
-  } =
-    getReturnState(
-      formData
-    );
+  } = getReturnState(
+    formData
+  );
 
   const parsed =
     parseTransactionForm(
@@ -1403,32 +1517,22 @@ export async function createTransactionAction(
   const {
     userId,
     householdId,
-  } =
-    await requireHousehold(
-      supabase,
-      monthKey,
-      tab
-    );
+  } = await requireHousehold(
+    supabase,
+    monthKey,
+    tab
+  );
 
   const values =
     parsed.values;
 
-  await validateCategory(
-    supabase,
-    householdId,
-    values.categoryId,
-    values.transactionType,
-    monthKey,
-    tab
-  );
-
-  await validateTransactionMembers(
+  await validateTransactionRelations({
     supabase,
     householdId,
     values,
     monthKey,
-    tab
-  );
+    tab,
+  });
 
   const {
     error,
@@ -1485,10 +1589,11 @@ export async function createTransactionAction(
     );
   }
 
-  revalidatePath(
-    "/dashboard"
-  );
-
+  /*
+   * DashboardPageはforce-dynamicで、
+   * この直後に同じ画面へredirectするため、
+   * revalidatePathは不要です。
+   */
   redirectWithMessage(
     values.transactionType ===
       "expense"
@@ -1553,22 +1658,13 @@ export async function updateTransactionAction(
   const values =
     parsed.values;
 
-  await validateCategory(
-    supabase,
-    householdId,
-    values.categoryId,
-    values.transactionType,
-    monthKey,
-    tab
-  );
-
-  await validateTransactionMembers(
-    supabase,
-    householdId,
-    values,
-    monthKey,
-    tab
-  );
+  await validateTransactionRelations({
+  supabase,
+  householdId,
+  values,
+  monthKey,
+  tab,
+});
 
   const {
     data,
@@ -1628,9 +1724,7 @@ export async function updateTransactionAction(
     );
   }
 
-  revalidatePath(
-    "/dashboard"
-  );
+
 
   redirectWithMessage(
     "登録内容を更新しました。",

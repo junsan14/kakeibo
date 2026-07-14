@@ -298,38 +298,29 @@ export async function POST(
         )
       );
 
-    let inserted = 0;
+    const rowsToInsert =
+    effectiveVersions
+      .filter((version) => {
+        return (
+          version.is_active &&
+          !existingGroups.has(
+            version.recurring_group_id
+          )
+        );
+      })
+      .map((version) => {
+        const transactionDate =
+          getRecurringDate({
+            periodKey:
+              monthKey,
 
-    for (
-      const version of
-      effectiveVersions
-    ) {
-      if (
-        !version.is_active ||
-        existingGroups.has(
-          version
-            .recurring_group_id
-        )
-      ) {
-        continue;
-      }
+            cycleStartDay,
 
-      const transactionDate =
-        getRecurringDate({
-          periodKey:
-            monthKey,
+            dueDay:
+              version.due_day,
+          });
 
-          cycleStartDay,
-
-          dueDay:
-            version.due_day,
-        });
-
-      const {
-        error,
-      } = await supabase
-        .from("transactions")
-        .insert({
+        return {
           household_id:
             householdId,
 
@@ -340,13 +331,10 @@ export async function POST(
             version.title,
 
           amount:
-            Number(
-              version.amount
-            ),
+            Number(version.amount),
 
           transaction_type:
-            version
-              .transaction_type,
+            version.transaction_type,
 
           transaction_date:
             transactionDate,
@@ -355,8 +343,7 @@ export async function POST(
             userId,
 
           paid_by_user_id:
-            version
-              .paid_by_user_id,
+            version.paid_by_user_id,
 
           memo:
             version.memo,
@@ -365,36 +352,64 @@ export async function POST(
             version.id,
 
           recurring_group_id:
-            version
-              .recurring_group_id,
+            version.recurring_group_id,
 
           recurrence_period_key:
             `${monthKey}-01`,
 
           allocation_scope:
-            version
-              .allocation_scope,
+            version.allocation_scope,
 
           personal_owner_user_id:
             version
               .personal_owner_user_id,
-        });
+        };
+      });
 
-      if (!error) {
-        inserted += 1;
-        continue;
-      }
+  if (rowsToInsert.length === 0) {
+    return NextResponse.json({
+      inserted: 0,
+    });
+  }
 
-      if (
-        error.code !==
-        "23505"
-      ) {
-        console.error(
-          "Recurring insert error:",
-          error
-        );
+  const {
+    error: insertError,
+    count: insertedCount,
+  } = await supabase
+    .from("transactions")
+    .upsert(
+      rowsToInsert,
+      {
+        onConflict:
+          "household_id,recurring_group_id,recurrence_period_key",
+
+        ignoreDuplicates: true,
+        count: "exact",
       }
-    }
+    );
+
+  if (insertError) {
+    console.error(
+      "Recurring bulk insert error:",
+      insertError
+    );
+
+    return NextResponse.json(
+      {
+        error:
+          "固定収支の登録に失敗しました。",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+
+  return NextResponse.json({
+    inserted:
+      insertedCount ??
+      rowsToInsert.length,
+  });
 
     return NextResponse.json({
       inserted,
