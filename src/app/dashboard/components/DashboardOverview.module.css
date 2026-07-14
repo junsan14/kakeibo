@@ -1,0 +1,645 @@
+.eyebrow {
+  margin: 0 0 7px;
+  color:
+    var(--color-primary);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.summaryCard {
+  min-width: 0;
+  padding: 22px;
+  background:
+    var(--color-surface);
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 20px;
+  box-shadow:
+    var(--shadow-small);
+}
+
+.summaryCard > span {
+  color:
+    var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.summaryCard > strong {
+  display: block;
+  margin: 10px 0 7px;
+  overflow: hidden;
+  font-size: 25px;
+  letter-spacing: -0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summaryCard small {
+  color:
+    var(--color-text-muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.availableCard {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(99, 102, 241, 0.1),
+      var(--color-surface)
+    );
+  border-color:
+    rgba(99, 102, 241, 0.2);
+}
+
+.incomeAmount {
+  color: #059669;
+}
+
+.expenseAmount {
+  color: #e11d48;
+}
+
+.goalAmount {
+  color: #7c3aed;
+}
+
+.availableAmount {
+  color: #4f46e5;
+}
+
+.budgetStatus {
+  margin-bottom: 18px;
+  padding: 25px;
+  background:
+    var(--color-surface);
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 22px;
+  box-shadow:
+    var(--shadow-small);
+}
+
+.budgetHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content:
+    space-between;
+  gap: 20px;
+}
+
+.budgetHeader h2 {
+  margin: 0 0 5px;
+  font-size: 21px;
+}
+
+.budgetHeader > div > span {
+  color:
+    var(--color-text-muted);
+  font-size: 11px;
+}
+
+.budgetPercentage {
+  display: grid;
+  justify-items: end;
+}
+
+.budgetPercentage strong {
+  font-size: 26px;
+  letter-spacing: -0.05em;
+}
+
+.budgetPercentage span {
+  color:
+    var(--color-text-muted);
+  font-size: 10px;
+}
+
+.progressTrack {
+  height: 12px;
+  margin: 20px 0;
+  overflow: hidden;
+  background:
+    var(--color-background-soft);
+  border-radius: 999px;
+}
+
+.progressBar,
+.progressOver {
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+}
+
+.progressBar {
+  background:
+    linear-gradient(
+      90deg,
+      #6366f1,
+      #8b5cf6
+    );
+}
+
+.progressOver {
+  background:
+    linear-gradient(
+      90deg,
+      #f43f5e,
+      #e11d48
+    );
+}
+
+.budgetStats {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.budgetStats > div {
+  padding: 14px;
+  background:
+    var(--color-background-soft);
+  border-radius: 13px;
+}
+
+.budgetStats span {
+  display: block;
+  margin-bottom: 6px;
+  color:
+    var(--color-text-muted);
+  font-size: 10px;
+}
+
+.budgetStats strong {
+  font-size: 15px;
+}
+
+.budgetWarning {
+  margin-top: 15px;
+  padding: 12px 14px;
+  color: #be123c;
+  font-size: 12px;
+  background: #fff1f2;
+  border:
+    1px solid #fecdd3;
+  border-radius: 11px;
+}
+
+.breakdownPanel {
+  min-height: 390px;
+  margin-bottom: 18px;
+  padding: 28px;
+  background:
+    var(--color-surface);
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 24px;
+  box-shadow:
+    var(--shadow-small);
+}
+
+.panelHeader {
+  margin-bottom: 20px;
+}
+
+.panelHeader h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+
+.panelHeader span {
+  color:
+    var(--color-text-muted);
+  font-size: 12px;
+}
+
+.scopeTabs {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(130px, 1fr)
+    );
+  gap: 7px;
+  margin-bottom: 18px;
+  padding: 5px;
+  background:
+    var(--color-background-soft);
+  border-radius: 13px;
+}
+
+.scopeButton {
+  min-height: 40px;
+  padding: 8px 12px;
+  color:
+    var(--color-text-muted);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  background: transparent;
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.scopeButtonActive {
+  color: white;
+  background:
+    var(--color-primary);
+  box-shadow:
+    0 7px 16px
+    rgba(99, 102, 241, 0.18);
+}
+
+.pieLayout {
+  display: grid;
+  grid-template-columns:
+    minmax(260px, 0.85fr)
+    minmax(260px, 1.15fr);
+  align-items: center;
+  gap: 22px;
+}
+
+.pieChart {
+  position: relative;
+  height: 285px;
+}
+
+.pieCenter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 130px;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  transform:
+    translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.pieCenter span {
+  color:
+    var(--color-text-muted);
+  font-size: 10px;
+}
+
+.pieCenter strong {
+  max-width: 130px;
+  overflow: hidden;
+  font-size: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pieLegend {
+  max-height: 285px;
+  overflow-y: auto;
+}
+
+.legendItem {
+  display: grid;
+  grid-template-columns:
+    9px
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 8px;
+  border-bottom:
+    1px solid
+    var(--color-border);
+}
+
+.legendColor {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.legendItem > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.legendItem strong {
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legendItem small {
+  color:
+    var(--color-text-muted);
+  font-size: 9px;
+}
+
+.legendItem b {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.chartTooltip {
+  min-width: 145px;
+  padding: 12px 13px;
+  color:
+    var(--color-text);
+  background:
+    var(--color-surface);
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 12px;
+  box-shadow:
+    var(--shadow-medium);
+}
+
+.chartTooltip p {
+  margin: 8px 0 2px;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.chartTooltip small {
+  color:
+    var(--color-text-muted);
+  font-size: 9px;
+}
+
+.emptyChart {
+  min-height: 260px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.emptyChart > span {
+  font-size: 40px;
+}
+
+.emptyChart p {
+  margin: 0;
+  color:
+    var(--color-text-muted);
+  font-size: 11px;
+}
+
+.settlementAccordion {
+  margin-bottom: 18px;
+  overflow: hidden;
+  background:
+    var(--color-surface);
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 22px;
+  box-shadow:
+    var(--shadow-small);
+}
+
+.settlementSummary {
+  min-height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content:
+    space-between;
+  gap: 22px;
+  padding: 19px 24px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.settlementSummary::-webkit-details-marker {
+  display: none;
+}
+
+.settlementSummary::after {
+  content: "＋";
+  flex: 0 0 auto;
+  color:
+    var(--color-primary);
+  font-size: 22px;
+}
+
+.settlementAccordion[open]
+.settlementSummary::after {
+  content: "−";
+}
+
+.settlementSummary > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.settlementSummary > div:first-child > strong {
+  font-size: 17px;
+}
+
+.settlementSummary small {
+  color:
+    var(--color-text-muted);
+  font-size: 10px;
+}
+
+.settlementResult {
+  min-width: 180px;
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  margin-left: auto;
+  text-align: right;
+}
+
+.settlementResult strong {
+  color:
+    var(--color-primary);
+  font-size: 18px;
+}
+
+.settlementResult > span {
+  color:
+    var(--color-text-muted);
+  font-size: 10px;
+}
+
+.settlementContent {
+  padding: 23px 24px 24px;
+  border-top:
+    1px solid
+    var(--color-border);
+}
+
+.paymentGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.paymentCard {
+  display: grid;
+  gap: 7px;
+  padding: 17px;
+  background:
+    var(--color-background-soft);
+  border-radius: 16px;
+}
+
+.paymentCard > strong {
+  font-size: 13px;
+}
+
+.paymentCard > span,
+.paymentCard > small {
+  color:
+    var(--color-text-muted);
+  font-size: 10px;
+}
+
+.paymentCard > b {
+  font-size: 21px;
+}
+
+.settlementCalculation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 17px;
+  padding: 17px;
+  background:
+    var(--color-background-soft);
+  border-radius: 15px;
+}
+
+.settlementCalculation i {
+  color:
+    var(--color-text-muted);
+  font-style: normal;
+}
+
+.transferBox {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  margin-top: 17px;
+  padding: 18px;
+  text-align: center;
+  background:
+    rgba(99, 102, 241, 0.08);
+  border:
+    1px solid
+    rgba(99, 102, 241, 0.16);
+  border-radius: 15px;
+}
+
+.transferBox span,
+.transferBox small {
+  color:
+    var(--color-text-muted);
+  font-size: 9px;
+}
+
+.transferBox strong {
+  color:
+    var(--color-primary);
+  font-size: 15px;
+}
+
+.settlementNote {
+  margin: 13px 0 0;
+  color:
+    var(--color-text-muted);
+  font-size: 9px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+@media (max-width: 1050px) {
+  .summaryGrid {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 850px) {
+  .pieLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .summaryCard{
+    padding: 10px;
+  }
+  .summaryCard > strong{
+    margin:3px;
+  }
+  .summaryGrid{
+    gap:5px;
+  }
+  .budgetStats{
+    grid-template-columns: 1fr 1fr;
+  }
+  .paymentGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .budgetHeader {
+    flex-direction: column;
+  }
+
+  .budgetPercentage {
+    justify-items: start;
+  }
+
+  .breakdownPanel {
+    padding: 22px 16px;
+  }
+
+  .scopeTabs {
+    grid-template-columns: 1fr;
+  }
+
+  .pieChart {
+    height: 250px;
+  }
+
+  .settlementSummary {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 17px;
+  }
+
+  .settlementResult {
+    width: 100%;
+    min-width: 0;
+    justify-items: start;
+    order: 3;
+    margin-left: 0;
+    text-align: left;
+  }
+
+  .settlementContent {
+    padding: 18px 17px;
+  }
+}

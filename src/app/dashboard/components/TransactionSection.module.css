@@ -1,0 +1,787 @@
+.eyebrow {
+  margin: 0 0 7px;
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(7px);
+  animation:
+    modalBackdropIn
+    0.18s ease-out;
+}
+
+.modalDialog {
+  position: relative;
+  width: min(760px, 100%);
+  max-height:
+    calc(100dvh - 48px);
+  overflow: hidden;
+  background: var(--color-surface);
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 24px;
+  box-shadow:
+    0 28px 80px
+    rgba(15, 23, 42, 0.32);
+  animation:
+    modalDialogIn
+    0.22s ease-out;
+}
+
+.modalDialog .editorPanel {
+  max-height:
+    calc(100dvh - 48px);
+  overflow-y: auto;
+  border: 0;
+  box-shadow: none;
+  overscroll-behavior: contain;
+}
+
+.modalDialog .panelHeader {
+  padding-right: 42px;
+}
+
+.modalCloseButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 5;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 25px;
+  line-height: 1;
+  background:
+    var(--color-background-soft);
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    color 0.16s ease,
+    background 0.16s ease,
+    transform 0.16s ease;
+}
+
+.modalCloseButton:hover {
+  color: white;
+  background: var(--color-primary);
+  transform: rotate(90deg);
+}
+
+.modalCloseButton:focus-visible {
+  outline:
+    3px solid
+    rgba(99, 102, 241, 0.24);
+  outline-offset: 3px;
+}
+
+@keyframes modalBackdropIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalDialogIn {
+  from {
+    opacity: 0;
+    transform:
+      translateY(16px)
+      scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+.editorPanel {
+  padding: 28px;
+  background: var(--color-surface);
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 24px;
+  box-shadow: var(--shadow-small);
+  scroll-margin-top: 100px;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.panelHeader h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+
+.panelHeader > div > span {
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.cancelButton {
+  min-height: 40px;
+  padding: 0 13px;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  background: transparent;
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.cancelButton:hover {
+  color: var(--color-primary);
+  border-color:
+    rgba(99, 102, 241, 0.35);
+}
+
+.editorForm {
+  display: grid;
+  gap: 22px;
+}
+
+.allocationSection {
+  display: grid;
+  gap: 9px;
+  padding: 16px;
+  background:
+    var(--color-background-soft);
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 15px;
+}
+
+.allocationOptions {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(120px, 1fr)
+    );
+  gap: 7px;
+}
+
+.allocationButton {
+  min-height: 43px;
+  padding: 8px 12px;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  background: var(--color-surface);
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 11px;
+  cursor: pointer;
+}
+
+.allocationButton:hover {
+  color: var(--color-primary);
+  border-color:
+    rgba(99, 102, 241, 0.3);
+}
+
+.allocationButtonActive {
+  color: white;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow:
+    0 8px 18px
+    rgba(99, 102, 241, 0.18);
+}
+
+.allocationButtonActive:hover {
+  color: white;
+}
+
+.allocationSection small {
+  color: var(--color-text-muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.typeSwitch {
+  display: grid;
+  grid-template-columns:
+    repeat(2, 1fr);
+  gap: 6px;
+  padding: 5px;
+  background:
+    var(--color-background-soft);
+  border-radius: 14px;
+}
+
+.typeButton {
+  height: 43px;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.expenseActive {
+  color: #be123c;
+  background: #fff1f2;
+}
+
+.incomeActive {
+  color: #047857;
+  background: #ecfdf5;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.formGrid label {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.fieldLabel {
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.formGrid input,
+.formGrid select,
+.formGrid textarea {
+  width: 100%;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 14px;
+  background: var(--color-input);
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 12px;
+  outline: none;
+}
+
+.formGrid input,
+.formGrid select {
+  height: 48px;
+  padding: 0 13px;
+}
+
+.formGrid textarea {
+  min-height: 82px;
+  padding: 12px 13px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.formGrid input:focus,
+.formGrid select:focus,
+.formGrid textarea:focus {
+  border-color:
+    var(--color-primary);
+  box-shadow:
+    0 0 0 4px
+    rgba(99, 102, 241, 0.12);
+}
+
+.amountInput {
+  position: relative;
+}
+
+.amountInput > span {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  z-index: 2;
+  color: var(--color-text-muted);
+  font-weight: 800;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.amountInput input {
+  padding-left: 34px;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.primaryButton {
+  min-width: 145px;
+  min-height: 48px;
+  padding: 0 20px;
+  color: white;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  background:
+    linear-gradient(
+      135deg,
+      #6366f1,
+      #8b5cf6
+    );
+  border: 0;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 22px
+    rgba(99, 102, 241, 0.2);
+  cursor: pointer;
+}
+
+.primaryButton:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.primaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.categoryWarning {
+  padding: 12px 14px;
+  color: #92400e;
+  font-size: 12px;
+  background: #fffbeb;
+  border:
+    1px solid
+    #fde68a;
+  border-radius: 11px;
+}
+
+.historyAccordion {
+  margin-bottom: 18px;
+  overflow: hidden;
+  background: var(--color-surface);
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 22px;
+  box-shadow: var(--shadow-small);
+}
+
+.historySummary {
+  min-height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 19px 24px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.historySummary::-webkit-details-marker {
+  display: none;
+}
+
+.historySummary::after {
+  content: "＋";
+  color: var(--color-primary);
+  font-size: 22px;
+}
+
+.historyAccordion[open]
+  .historySummary::after {
+  content: "−";
+}
+
+.historySummary > div {
+  display: grid;
+  gap: 3px;
+}
+
+.historySummary > div > strong {
+  font-size: 17px;
+}
+
+.historySummary small {
+  color: var(--color-text-muted);
+  font-size: 10px;
+}
+
+.historySummary > b {
+  margin-left: auto;
+  padding: 6px 10px;
+  color: var(--color-text-muted);
+  font-size: 10px;
+  background:
+    var(--color-background-soft);
+  border-radius: 999px;
+}
+
+.historyContent {
+  padding: 0 24px 24px;
+  border-top:
+    1px solid
+    var(--color-border);
+}
+
+.historyScopeTabs {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(130px, 1fr)
+    );
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.historyScopeButton {
+  min-height: 45px;
+  padding: 9px 12px;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  background:
+    var(--color-background-soft);
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 11px;
+  cursor: pointer;
+}
+
+.historyScopeButton:hover {
+  color: var(--color-primary);
+}
+
+.historyScopeActive {
+  color: var(--color-primary);
+  background:
+    rgba(99, 102, 241, 0.1);
+  border-color:
+    rgba(99, 102, 241, 0.3);
+}
+
+.typeFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 18px 0;
+}
+
+.typeFilter {
+  padding: 8px 13px;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  background:
+    var(--color-background-soft);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.typeFilter:hover {
+  color: var(--color-primary);
+}
+
+.typeFilterActive {
+  color: white;
+  background: var(--color-primary);
+}
+
+.typeFilterActive:hover {
+  color: white;
+}
+
+.historyList {
+  display: grid;
+}
+
+.historyItem {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 17px 0;
+  border-bottom:
+    1px solid
+    var(--color-border);
+}
+
+.historyItem:last-child {
+  border-bottom: 0;
+}
+
+.transactionMain {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+}
+
+.transactionIcon {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  font-size: 20px;
+  border-radius: 13px;
+}
+
+.transactionInfo {
+  min-width: 0;
+}
+
+.transactionTitle {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 6px;
+}
+
+.transactionTitle > strong {
+  font-size: 14px;
+}
+
+.transactionTitle > span {
+  padding: 3px 7px;
+  color: #7c3aed;
+  font-size: 9px;
+  font-weight: 800;
+  background: #f5f3ff;
+  border-radius: 999px;
+}
+
+.transactionMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 12px;
+  color: var(--color-text-muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.transactionInfo p {
+  margin: 7px 0 0;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.transactionRight {
+  display: grid;
+  justify-items: end;
+  flex: 0 0 auto;
+  gap: 9px;
+}
+
+.transactionRight > strong {
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.expenseAmount {
+  color: #e11d48;
+}
+
+.incomeAmount {
+  color: #059669;
+}
+
+.transactionActions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.editButton,
+.deleteButton {
+  padding: 6px 9px;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.editButton {
+  color: var(--color-primary);
+  border:
+    1px solid
+    rgba(99, 102, 241, 0.25);
+}
+
+.editButton:hover {
+  background:
+    rgba(99, 102, 241, 0.08);
+}
+
+.deleteButton {
+  color: #e11d48;
+  border:
+    1px solid
+    rgba(225, 29, 72, 0.22);
+}
+
+.deleteButton:hover {
+  background:
+    rgba(225, 29, 72, 0.07);
+}
+
+.emptyHistory {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 45px 20px;
+}
+
+.emptyHistory span {
+  font-size: 34px;
+}
+
+@media (max-width: 760px) {
+  .modalBackdrop {
+    place-items: center;
+    padding: 2dvh 12px;
+  }
+
+  .modalDialog {
+    width: 100%;
+    max-height: 96dvh;
+    border:
+      1px solid
+      var(--color-border);
+    border-radius: 22px;
+  }
+
+  .modalDialog::before {
+    display: none;
+  }
+
+  .modalDialog .editorPanel {
+    max-height: 96dvh;
+    padding-top: 24px;
+    padding-bottom:
+      max(
+        24px,
+        env(safe-area-inset-bottom)
+      );
+  }
+
+  .modalDialog .panelHeader {
+    padding-right: 38px;
+  }
+
+  .modalCloseButton {
+    top: 14px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .editorPanel {
+    padding: 22px 16px;
+  }
+
+  .panelHeader {
+    flex-direction: column;
+  }
+
+  .allocationOptions{
+    grid-template-columns: 33% 33% 33%;
+  }
+  .formGrid,
+  .historyScopeTabs {
+    grid-template-columns: 1fr;
+  }
+
+  .fullWidth {
+    grid-column: auto;
+  }
+
+  .formActions,
+  .primaryButton {
+    width: 100%;
+  }
+
+  .historySummary {
+    padding: 17px;
+  }
+
+  .historyContent {
+    padding:
+      0 17px 17px;
+  }
+
+  .historyItem {
+    flex-direction: column;
+  }
+
+  .transactionRight {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content:
+      space-between;
+    padding-left: 56px;
+  }
+}
+
+@media (max-width: 430px) {
+  .transactionRight {
+    padding-left: 0;
+  }
+
+  .historySummary {
+    gap: 10px;
+  }
+
+  .historySummary > b {
+    padding: 5px 8px;
+  }
+}

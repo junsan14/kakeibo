@@ -1,0 +1,311 @@
+.panel {
+  min-height: 540px;
+  padding: 28px;
+  background:
+    var(--color-surface);
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 24px;
+  box-shadow:
+    var(--shadow-small);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content:
+    space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.header p {
+  margin: 0 0 7px;
+  color:
+    var(--color-primary);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.header h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+
+.header > div:first-child > span {
+  color:
+    var(--color-text-muted);
+  font-size: 12px;
+}
+
+.totalBox {
+  min-width: 190px;
+  display: grid;
+  justify-items: end;
+  gap: 5px;
+  padding: 14px 16px;
+  text-align: right;
+  background:
+    var(--color-background-soft);
+  border-radius: 14px;
+}
+
+.totalBox span {
+  color:
+    var(--color-text-muted);
+  font-size: 9px;
+}
+
+.totalBox strong {
+  font-size: 19px;
+}
+
+.scopeTabs {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(130px, 1fr)
+    );
+  gap: 8px;
+  margin-bottom: 22px;
+  padding: 5px;
+  background:
+    var(--color-background-soft);
+  border-radius: 13px;
+}
+
+.scopeButton {
+  min-height: 42px;
+  padding: 8px 12px;
+  color:
+    var(--color-text-muted);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  background: transparent;
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.scopeButtonActive {
+  color: white;
+  background:
+    var(--color-primary);
+  box-shadow:
+    0 7px 16px
+    rgba(99, 102, 241, 0.18);
+}
+
+.chartScroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x:
+    contain;
+}
+
+.chart {
+  width: 100%;
+  min-width: 760px;
+  height: 380px;
+}
+
+.legend {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(180px, 1fr)
+    );
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.legendItem {
+  display: grid;
+  grid-template-columns:
+    10px
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 12px;
+  background:
+    var(--color-background-soft);
+  border-radius: 11px;
+}
+
+.legendColor {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.legendItem strong {
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legendItem b {
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.tooltip {
+  min-width: 220px;
+  max-width: 300px;
+  padding: 13px;
+  color:
+    var(--color-text);
+  background:
+    var(--color-surface);
+  border:
+    1px solid
+    var(--color-border);
+  border-radius: 13px;
+  box-shadow:
+    var(--shadow-medium);
+}
+
+.tooltipHeader {
+  display: flex;
+  align-items: center;
+  justify-content:
+    space-between;
+  gap: 15px;
+  padding-bottom: 10px;
+  border-bottom:
+    1px solid
+    var(--color-border);
+}
+
+.tooltipHeader strong {
+  font-size: 12px;
+}
+
+.tooltipHeader b {
+  color:
+    var(--color-primary);
+  font-size: 13px;
+}
+
+.tooltipList {
+  display: grid;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.tooltipList > div {
+  display: grid;
+  grid-template-columns:
+    8px
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 7px;
+}
+
+.tooltipList span,
+.tooltipList strong {
+  font-size: 10px;
+}
+
+.tooltipList strong {
+  white-space: nowrap;
+}
+
+.tooltipColor {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.tooltipEmpty {
+  margin: 10px 0 0;
+  color:
+    var(--color-text-muted);
+  font-size: 10px;
+}
+
+.help {
+  margin: 14px 0 0;
+  color:
+    var(--color-text-muted);
+  font-size: 10px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.emptyState {
+  min-height: 350px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.emptyState > span {
+  font-size: 42px;
+}
+
+.emptyState p {
+  max-width: 340px;
+  margin: 0;
+  color:
+    var(--color-text-muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.panel
+:global(.recharts-surface:focus) {
+  outline: none;
+}
+
+@media (max-width: 760px) {
+  .panel {
+    padding: 22px 12px;
+  }
+
+  .header {
+    flex-direction: column;
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+
+  .totalBox {
+    width: 100%;
+    min-width: 0;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .scopeTabs {
+    grid-template-columns: 1fr;
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+
+  .chart {
+    min-width: 680px;
+    height: 330px;
+  }
+
+  .legend {
+    grid-template-columns: 1fr;
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+
+  .help {
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+}
